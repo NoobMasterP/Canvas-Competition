@@ -4,32 +4,207 @@
     
     <canvas id="canvasArea1" style="position: absolute; left: 0; top: 0; z-index: 0; width:100%;height:100%"></canvas>
     <canvas id="canvasArea2" style="visibility: hidden; position: absolute; left: 0; top: 0; z-index: 0; width:100%;height:100%"></canvas>
-	
+    
     <script src="./canvas.js"></script>
 </body>
 
 </html>
 <script>
 
-    // Declare all global variables here
+        // Declare all global variables here
+        var gravity = 9.8;
+        var bird_mass = 2;
+        var pig_mass = 2;
+        var PI = 3.1415926;
+        var x = 120;
+        var y = 650;
+        var x_initial = x;
+        var y_initial =y;
+        const velocity = 80;
+        var angle;
+        var t = 0;
+        var flag =0;
+        var ball_disappear = false;
+        var pig_disappear = false;
+        var win = false;
+        var angle2 = PI / 3;
+        var x_final;
+        var y_final;
+        var mouse_flag = 0;
+        var color = ["red", "red", "yellow", "yellow", "green", "green"];
+        var i = 0;
 
-    // Declare custom functions here
+        // Declare custom functions here
 
-    // Function while will be called repeatedly 
-    function main() {
+        function background()
+        {
+            canvas.setDrawMode("fill");
+            canvas.setColor("brown");
+            canvas.drawRectangle(0, 700, canvas.width, 400);
+        }
+
+        class bird
+        {
+            constructor(radius, color, velocity, angle, t)
+            {
+                this.radius = radius;
+                this.color = color;
+                this.vx = velocity * Math.cos(angle);
+                this.vy = (velocity * Math.sin(angle) ) - gravity*t;
+            }
+
+            drawBird()
+            {
+                canvas.setDrawMode("fill");
+                canvas.setColor(this.color);
+                canvas.drawCircle(x, y, this.radius);
+            }
+
+            projection()
+            {
+                var timeLapse = 0.5;
+                x += this.vx * timeLapse;
+                y -= this.vy * timeLapse;
+                this.drawBird();
+            }
+        }
+
+        class pig
+        {
+            constructor(radius, color, pigx, pigy)
+            {
+                this.radius = radius;
+                this.color = color;
+                this.pigx = pigx;
+                this.pigy = pigy;
+            }
+
+            drawPig()
+            {
+                canvas.setDrawMode("fill");
+                canvas.setColor(this.color);
+                canvas.drawCircle(this.pigx, this.pigy, this.radius);
+            }
+        }
+
+        class obstacle
+        {
+            constructor(color, obs_x, obs_y)
+            {
+                this.obs_x = obs_x;
+                this.obs_y = obs_y;
+                this.color = color;
+            }
+
+            drawObstacle()
+            {
+                canvas.setDrawMode("fill");
+                canvas.setColor(this.color);
+                canvas.drawRectangle(this.obs_x, this.obs_y, 10, 150)
+            }
+        }
+
+        // Function while will be called repeatedly 
+    function main() 
+    {
         canvas.clear();
+        background();
+        canvas.setDrawMode("fill");
+        canvas.setColor("red");
+        canvas.drawRectangle(110, 650, 10, 50);
+        canvas.drawText(15, 690, "Launcher ->", fontSize = 15)
+        canvas.drawText(500, 100, "click anywhere to launch the ball ", fontSize = 30);
+        canvas.setDrawMode("fill");
+        canvas.setColor("black");
+        canvas.drawText(10, 10, "Hint :- Click the Black Dot to win easily ;)", fontSize = 10);
+        canvas.drawCircle(278, 302, 2);
+        var green_pig = new pig(20, "green", 620, 650);
+        var obs = new obstacle("blue", 500, 550);
+        obs.drawObstacle();
+        var obs2 = new obstacle("blue", 700, 550);
+        obs2.drawObstacle();
+        if(pig_disappear == false)
+        {
+            green_pig.drawPig();
+        }
+        if(mouse_flag == 1)
+        {
+        angle = Math.atan((-y_final + y_initial)/(x_final - x_initial));
+        console.log(angle);
+       
+        var red_bird = new bird(10, "red", velocity, angle, t);
         
+        t+=0.5;
+
+
+        if(y <= 700 && ball_disappear == false)
+        {
+            red_bird.projection();
+        }
+        if((x > 500 && x < 520 && y > 540 && y < 700) || (x>700 && x < 720 && y > 540 && y< 700))
+        {
+            canvas.drawText(200, 200, "You LOST!!! Go play with JOE MAMA!!!", fontSize = 30);
+            flag=-1;
+            ball_disappear = true;
+        }
+
+        if(flag == -1 && ball_disappear==true)
+        {
+            canvas.drawText(200, 200, "You LOST!!! Go play with JOE MAMA!!!", fontSize = 30);
+        }
+
+        if(x < 640 && x > 600 && y < 670 && y > 630 && ball_disappear == false)
+        {
+            flag=1;
+            ball_disappear = true;
+        }
+
+        if(flag==1 && ball_disappear== true)
+        {   
+            canvas.setDrawMode("fill");
+            canvas.setColor(color[i]);
+            canvas.drawText(200, 200, "You WON!!", fontSize = 30);
+            win = true;
+            
+            pig_disappear = true;
+            win = true;
+            i++;
+            if(i==6)
+            {
+                i = 1;
+            }
+
+        }
+
+        
+
+        if(pig_disappear == true)
+        {
+                        canvas.setDrawMode("fill");
+            canvas.setColor("green");
+            canvas.drawRectangle(600, 690, 60, 10);
+
+            canvas.drawText(600, 670, "PLOP!", fontSize = 20);
+        }
     }
 
-    // Override functions here; 
-    canvas.mainFunction = main;
+    }
 
-    var timeStep = 50;
-    canvas.startMain(timeStep);
+        // Override functions here; 
+        canvas.mouseDownCallback=function()
+        {
+            mouse_flag = 1;
+            x_final = canvas.mouseX;
+            y_final = canvas.mouseY;
+            console.log(x_final);
+            console.log(y_final)
+
+        }
+        canvas.mainFunction = main;
+        canvas.setup
+        var timeStep = 50;
+        canvas.startMain(timeStep);
 
 
     
 </script>
-
-
-
